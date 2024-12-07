@@ -2,16 +2,19 @@ const express = require("express");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const { google } = require("googleapis");
+require("dotenv").config();
+
 const fs = require("fs");
 const { hasUncaughtExceptionCaptureCallback } = require("process");
 
 const router = express.Router();
 
-const JWT_SECRET = "clave"; // Cambia en producción
-
+const JWT_SECRET = process.env.JWT_SECRET 
 // Configuración de Google Sheets
-const SPREADSHEET_ID = "1Y2DG_YEpuve6xUJV4ZHAQA42iQoTHlzDFtxMnIrxQWE"; // Reemplaza con el ID de tu hoja
-// // const credentials = JSON.parse(fs.readFileSync("./clientesdb.json", "utf-8")); // Reemplaza con la ruta a tu archivo de credenciales
+const SPREADSHEET_ID = process.env.SPREADSHEET_ID;
+// Reemplaza con el ID de tu hoja
+const credentials = JSON.parse(process.env.GOOGLE_CREDENTIALS);
+
 
 const auth = new google.auth.GoogleAuth({
   credentials,
