@@ -1,3 +1,4 @@
-node_modules
-.env
-clientesdb.json
+server/node_modules
+server/.env
+server/client_secret.json
+server/clientesdb.json
