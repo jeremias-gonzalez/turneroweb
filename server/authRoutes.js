@@ -11,7 +11,7 @@ const JWT_SECRET = "clave"; // Cambia en producción
 
 // Configuración de Google Sheets
 const SPREADSHEET_ID = "1Y2DG_YEpuve6xUJV4ZHAQA42iQoTHlzDFtxMnIrxQWE"; // Reemplaza con el ID de tu hoja
-const credentials = JSON.parse(fs.readFileSync("./clientesdb.json", "utf-8")); // Reemplaza con la ruta a tu archivo de credenciales
+// // const credentials = JSON.parse(fs.readFileSync("./clientesdb.json", "utf-8")); // Reemplaza con la ruta a tu archivo de credenciales
 
 const auth = new google.auth.GoogleAuth({
   credentials,
