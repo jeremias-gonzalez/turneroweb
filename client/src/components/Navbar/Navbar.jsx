@@ -23,7 +23,11 @@ const Navbar = () => {
   };
 
   return (
+    <div>
     <nav className="bg-gray-800 text-white z-50 fixed w-full top-0 left-0 shadow-lg">
+      <div className="bg-white ">
+    <h1 className="text-black text-sm poppins-bold mx-3 p-2">👋Bienvenidos a mi sitio web oficial!👋</h1>
+    </div>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
           {/* Logo */}
@@ -108,7 +112,7 @@ const Navbar = () => {
 
       {/* Menú Móvil */}
       <div
-        className={`fixed top-0 left-0 w-full h-full bg-gray-800 text-white z-40 transition-transform transform ${
+        className={`fixed top-0 left-0 w-full h-full glass-effect text-white z-40 transition-transform transform ${
           isOpen ? "translate-y-0 opacity-100" : "-translate-y-full opacity-0"
         } sm:hidden`}
         style={{ transition: "transform 0.4s ease, opacity 0.4s ease" }}
@@ -133,24 +137,30 @@ const Navbar = () => {
           </svg>
         </button>
 
-        <nav className="flex flex-col items-center justify-center space-y-6 mt-16">
+        <nav className="flex flex-col items-center justify-center space-y-10 mt-36">
           <a
             onClick={() => navigateTo("/")}
-            className="text-xl hover:text-gray-300 cursor-pointer"
+            className="text-2xl text-black poppins-bold cursor-pointer"
           >
             Inicio
           </a>
           {isAuthenticated ? (
             <>
-              <a
-                onClick={() => navigateTo("/reservar")}
-                className="text-xl hover:text-gray-300 cursor-pointer"
+            <a
+                onClick={() => navigateTo("/mis-turnos")}
+                className="text-2xl text-black poppins-bold  cursor-pointer"
               >
                 Mis Turnos
               </a>
               <a
+                onClick={() => navigateTo("/micuenta")}
+                className="text-2xl text-black poppins-bold  cursor-pointer"
+              >
+                Mi Cuenta
+              </a>
+              <a
                 onClick={handleLogout}
-                className="text-xl hover:text-gray-300 cursor-pointer"
+                className="text-2xl text-black poppins-bold cursor-pointer"
               >
                 Cerrar Sesión
               </a>
@@ -158,14 +168,14 @@ const Navbar = () => {
           ) : (
             <>
               <a
-                onClick={() => navigateTo("/auth")}
-                className="text-xl hover:text-gray-300 cursor-pointer"
+                onClick={() => navigateTo("/login")}
+                className="text-2xl text-black poppins-bold cursor-pointer"
               >
                 Iniciar Sesión
               </a>
               <a
-                onClick={() => navigateTo("/auth")}
-                className="text-xl hover:text-gray-300 cursor-pointer"
+                onClick={() => navigateTo("/register")}
+                className="text-2xl text-black poppins-bold cursor-pointer"
               >
                 Registrarse
               </a>
@@ -174,6 +184,7 @@ const Navbar = () => {
         </nav>
       </div>
     </nav>
+  </div>
   );
 };
 

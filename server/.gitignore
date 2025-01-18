@@ -1,4 +1,2 @@
-server/node_modules
-server/.env
-server/client_secret.json
-server/clientesdb.json
+node_modules
+.env

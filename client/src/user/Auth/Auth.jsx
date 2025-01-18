@@ -35,7 +35,7 @@ const Auth = () => {
         localStorage.setItem("token", token);
         alert(message);
         // Redirigir al panel de reservas
-        window.location.href = "/reservas";
+        window.location.href = "/";
       } else {
         alert(message); // Mostrar mensaje de registro exitoso
       }
