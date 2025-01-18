@@ -19,7 +19,8 @@ const Register = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const response = await axios.post("http://localhost:5000/api/register", formData);
+      const backendUrl = import.meta.env.VITE_BACKEND_URL;
+      const response = await axios.post(`${backendUrl}/api/register`, formData);
       alert(response.data.message); // Mensaje de éxito
       navigate("/login"); // Redireccionar al inicio de sesión
     } catch (err) {

@@ -17,12 +17,12 @@ const Account = () => {
   });
   const [isEditing, setIsEditing] = useState(false);
   const [loading, setLoading] = useState(true); // Estado para manejar la carga
-
+  const backendUrl = import.meta.env.VITE_BACKEND_URL;
   useEffect(() => {
     const fetchUserData = async () => {
       try {
         const token = localStorage.getItem("token");
-        const response = await axios.get("http://localhost:5000/api/account", {
+        const response = await axios.get(`${backendUrl}/api/account`, {
           headers: { Authorization: `Bearer ${token}` },
         });
         setUserData(response.data);
@@ -46,7 +46,7 @@ const Account = () => {
     try {
       const token = localStorage.getItem("token");
       await axios.put(
-        "http://localhost:5000/api/account",
+        `${backendUrl}/api/account`, // Asegúrate de que la URL está correcta
         { ...userData },
         { headers: { Authorization: `Bearer ${token}` } }
       );
@@ -61,7 +61,6 @@ const Account = () => {
   const handleLogout = () => {
     logout();
   };
-
   return (
     <>
       <Navbar />

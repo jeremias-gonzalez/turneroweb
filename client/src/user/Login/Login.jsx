@@ -14,7 +14,8 @@ const Login = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const response = await axios.post("http://localhost:5000/api/login", formData);
+      const backendUrl = import.meta.env.VITE_BACKEND_URL;
+      const response = await axios.post(`${backendUrl}/api/login`, formData);
       localStorage.setItem("token", response.data.token);
       alert(response.data.message); // Mensaje de éxito
       window.location.href = "/"; // Redirigir al home

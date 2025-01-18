@@ -96,8 +96,8 @@ const Servicios = () => {
     const hora = selectedHour;
   
     try {
-      const response = await axios.post("http://localhost:5000/api/crear-turno", {
-        nombre: name,
+      const backendUrl = import.meta.env.VITE_BACKEND_URL;
+      const response = await axios.post(`${backendUrl}/api/crear-turno`, {   nombre: name,
         telefono: phone,
         fecha,
         hora,

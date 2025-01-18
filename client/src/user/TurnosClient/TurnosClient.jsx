@@ -11,7 +11,8 @@ export const TurnosClient = () => {
         if (!token) return; // Si no hay token, no hacemos la solicitud
   
         try {
-          const response = await axios.get("http://localhost:5000/api/account", {
+        const backendUrl = import.meta.env.VITE_BACKEND_URL;
+      const response = await axios.post(`${backendUrl}//api/account`, {
             headers: { Authorization: `Bearer ${token}` },
           });
           setUserName(response.data.nombre); // Guarda el nombre del usuario en el estado
