@@ -4,15 +4,16 @@ import Footer from "../../components/Footer/Footer";
 import axios from "axios";
 export const TurnosClient = () => {
     const [userName, setUserName] = useState("");
-
+   
     useEffect(() => {
       const fetchUserName = async () => {
+       
         const token = localStorage.getItem("token");
         if (!token) return; // Si no hay token, no hacemos la solicitud
   
         try {
-        const backendUrl = import.meta.env.VITE_BACKEND_URL;
-      const response = await axios.post(`${backendUrl}//api/account`, {
+          const backendUrl = import.meta.env.VITE_BACKEND_URL;
+          const response = await axios.get(`${backendUrl}/api/account`, {
             headers: { Authorization: `Bearer ${token}` },
           });
           setUserName(response.data.nombre); // Guarda el nombre del usuario en el estado

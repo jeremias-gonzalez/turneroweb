@@ -226,8 +226,8 @@ const Servicios = () => {
                   onClick={() => setSelectedDate(day)}
                   className={`py-2 px-4 rounded-full text-lg poppins-medium ${
                     selectedDate?.getDate() === day.getDate()
-                      ? "bg-white text-blue-500 border border-blue-500"
-                      : "bg-blue-500 text-white"
+                      ? "border border-blue-500 text-white bg-blue-500"
+                      : "bg-white text-blue-500 border border-blue-500" 
                   }`}
                 >
                   {format(day, "dd")}
@@ -247,8 +247,8 @@ const Servicios = () => {
                         ? "border border-blue-400 shadow-md focus-outline-blue-500"
                         : "bg-gray-300 cursor-not-allowed"
                     } 
-                    ${selectedHour === slot.time ? "bg-blue-600 text-white" : ""} 
-                    text-black transition duration-200`}
+                    ${selectedHour === slot.time ? "bg-blue-500 text-white" : ""} 
+                    text-blue-500 transition duration-200`}
                 >
                   {slot.time}
                 </button>
