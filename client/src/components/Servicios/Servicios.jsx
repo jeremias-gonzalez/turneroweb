@@ -3,11 +3,12 @@ import { useNavigate } from "react-router-dom";
 import { format, addDays, startOfMonth, endOfMonth, eachDayOfInterval, eachHourOfInterval } from "date-fns";
 import axios from "axios";
 import { gapi } from "gapi-script";
-import { useAuth } from "../../components/Context/AuthContext"; // Importa el contexto de autenticación
+import { useAuth } from "../../components/Context/AuthContext";
+import Modal from "../ModalCalendar/ModalCalendar"; // Importa el modal
 
 const Servicios = () => {
   const navigate = useNavigate();
-  const { isAuthenticated, user } = useAuth(); // Consumo del contexto de autenticación
+  const { isAuthenticated, user } = useAuth(); // Accediendo al contexto de autenticación
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedDate, setSelectedDate] = useState(null);
   const [schedule, setSchedule] = useState([]);
@@ -15,8 +16,6 @@ const Servicios = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [currentMonth, setCurrentMonth] = useState(new Date());
   const [selectedHour, setSelectedHour] = useState(null);
-
-
   const [isAnimating, setIsAnimating] = useState(false);
 
   useEffect(() => {
@@ -24,13 +23,13 @@ const Servicios = () => {
       setTimeout(() => setIsAnimating(true), 10); // Añade una pequeña demora para animación de entrada
     } else {
       setIsAnimating(false);
-       // Restablece la animación de salida
     }
   }, [isModalOpen]);
+
   const servicios = [
-    { imgUrl: "https://image.jpg", nombre: "Corte de Pelo", duracion: "30 min", precio: "8.000" },
-    { imgUrl: "https://image2.jpg", nombre: "Corte de Pelo + Barba", duracion: "40 min", precio: "10.000" },
-    { imgUrl: "https://image3.jpg", nombre: "Color a elección", duracion: "3 horas", precio: "15.000" },
+    { imgUrl: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSdGYoPxqtp6AIM0nnTFPOvt8rrI5Any0P3PA&s", nombre: "Corte de Pelo", duracion: "30 min", precio: "8.000" },
+    { imgUrl: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSCposOC8yyOrzGBTmnklKFpoZu8egjOUAI7g&s", nombre: "Corte de Pelo + Barba", duracion: "40 min", precio: "10.000" },
+    { imgUrl: "https://st4allthings4p4ci.blob.core.windows.net/allthingshair/allthingshair/wp-content/uploads/sites/5/2023/11/78892/ATH.jpg", nombre: "Color a elección", duracion: "3 horas", precio: "15.000" },
   ];
 
   useEffect(() => {
@@ -40,7 +39,6 @@ const Servicios = () => {
       console.error("Error al cargar gapi:", error);
     }
   }, []);
-  
 
   const initClient = () => {
     gapi.client.init({
@@ -81,7 +79,10 @@ const Servicios = () => {
   };
 
   const handleReserve = async () => {
-    if (!isAuthenticated || !user) {
+    console.log("Usuario autenticado:", user); // Aquí agregamos el console.log para verificar los datos de `user`
+    
+    if (!isAuthenticated) {
+      console.error("El usuario no está autenticado.");
       alert("Por favor, inicie sesión para realizar una reserva");
       return;
     }
@@ -91,22 +92,34 @@ const Servicios = () => {
       return;
     }
   
-    const { name, phone } = user;
-    const fecha = format(selectedDate, "yyyy-MM-dd");
-    const hora = selectedHour;
+    if (!selectedHour) {
+      alert("Por favor, selecciona una hora para tu turno");
+      return;
+    }
   
+    // Datos del usuario
+    const { name, phone } = user || {};
+    
+    console.log("Datos del usuario:", { name, phone }); // Verifica si 'name' y 'phone' están definidos
+  
+    if (!name || !phone) {
+      alert("Faltan datos del usuario.");
+      return;
+    }
+  
+    // Enviar datos al backend
     try {
       const backendUrl = import.meta.env.VITE_BACKEND_URL;
-      const response = await axios.post(`${backendUrl}/api/crear-turno`, {   nombre: name,
+      const response = await axios.post(`${backendUrl}/api/crear-turno`, {
+        nombre: name,
         telefono: phone,
-        fecha,
-        hora,
+        fecha: format(selectedDate, "yyyy-MM-dd"),
+        hora: selectedHour,
         servicio: selectedService.nombre,
       });
   
       if (response.status === 200) {
         alert("¡Turno reservado con éxito!");
-        createGoogleCalendarEvent(fecha, hora);
         closeModal();
       }
     } catch (error) {
@@ -114,43 +127,12 @@ const Servicios = () => {
       alert(`Error al reservar el turno: ${error.response?.data?.message || "Inténtalo nuevamente."}`);
     }
   };
-  
-  const createGoogleCalendarEvent = (fecha, hora) => {
-    const [hour, minute] = hora.split(":");
-    const startDateTime = new Date(fecha).setHours(hour, minute, 0);
-    const durationMinutes = parseInt(selectedService.duracion.split(" ")[0]) || 30; // Usa la duración del servicio o 30 minutos por defecto
-    const endDateTime = new Date(startDateTime).setMinutes(new Date(startDateTime).getMinutes() + durationMinutes);
-  
-    const event = {
-      summary: `${selectedService.nombre} - ${user.name}`,
-      description: `Servicio: ${selectedService.nombre}`,
-      start: {
-        dateTime: new Date(startDateTime),
-        timeZone: "America/Argentina/Buenos_Aires",
-      },
-      end: {
-        dateTime: new Date(endDateTime),
-        timeZone: "America/Argentina/Buenos_Aires",
-      },
-      attendees: [{ email: "cliente@example.com" }],
-    };
-  
-    const request = gapi.client.calendar.events.insert({
-      calendarId: "primary",
-      resource: event,
-    });
-  
-    request.execute((event) => {
-      console.log("Evento creado: " + event.htmlLink);
-      alert("Evento creado en tu calendario!");
-    });
-  };
-  
 
   const daysInMonth = eachDayOfInterval({
     start: startOfMonth(currentMonth),
     end: endOfMonth(currentMonth),
   });
+
 
   return (
     <div className="flex flex-col items-center min-h-screen py-8">
@@ -161,112 +143,44 @@ const Servicios = () => {
             <img src={servicio.imgUrl} alt={servicio.nombre} className="w-96 h-86 p-2 rounded-xl" />
             <div className="p-4 grid grid-cols-2 gap-4 items-start md:items-center">
               <div className="flex flex-col gap-4">
-                <div className="text-lg font-semibold text-gray-700">{servicio.nombre}</div>
+                <div className="text-lg poppins-semibold text-gray-700">{servicio.nombre}</div>
                 <button
                   onClick={() => handleButtonClick(servicio)}
-                  className="w-full bg-white text-blue-900 border shadow-sm rounded-full py-2"
+                  className="w-full  poppins-semibold bg-white text-blue-900 border shadow-sm rounded-full py-2"
                 >
                   Reservar
                 </button>
               </div>
               <div className="flex flex-col gap-4 text-right">
                 <div className="flex items-center justify-end text-sm text-gray-500">
-                  <p>{servicio.duracion}</p>
+                <svg xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" width="15" height="15" viewBox="0 0 50 50">
+<path d="M 25 2 C 12.309295 2 2 12.309295 2 25 C 2 37.690705 12.309295 48 25 48 C 37.690705 48 48 37.690705 48 25 C 48 12.309295 37.690705 2 25 2 z M 25 4 C 36.609824 4 46 13.390176 46 25 C 46 36.609824 36.609824 46 25 46 C 13.390176 46 4 36.609824 4 25 C 4 13.390176 13.390176 4 25 4 z M 24.984375 6.9863281 A 1.0001 1.0001 0 0 0 24 8 L 24 22.173828 A 3 3 0 0 0 22 25 A 3 3 0 0 0 22.294922 26.291016 L 16.292969 32.292969 A 1.0001 1.0001 0 1 0 17.707031 33.707031 L 23.708984 27.705078 A 3 3 0 0 0 25 28 A 3 3 0 0 0 28 25 A 3 3 0 0 0 26 22.175781 L 26 8 A 1.0001 1.0001 0 0 0 24.984375 6.9863281 z"></path>
+</svg>
+                  <p className="mx-1 poppins-semibold">{servicio.duracion}</p>
+                  
                 </div>
-                <div className="text-lg text-gray-700">${servicio.precio} ARS</div>
+                <div className="text-lg poppins-semibold mt-2 text-gray-700">${servicio.precio} ARS</div>
               </div>
             </div>
           </div>
         ))}
       </div>
-      {isModalOpen && (
-        <div className="fixed z-50 flex items-center justify-center ">
-          <div
-          className={`bg-white mt-[-8rem] p-6 rounded-2xl shadow-lg w-96 transform ${
-            isAnimating ? "modal-enter-active" : "modal-enter"
-          }`}
->
-            <div className="flex justify-center">
-              <h2 className="text-lg text-center font-semibold text-gray-800 mb-6">
-                {selectedService?.nombre}
-              </h2>
-            </div>
 
-            <div className="flex justify-center mt-[-2.8rem] ml-[10rem]">
-              <button
-                onClick={closeModal}
-                className="text-black transition duration-200"
-              >
-                X
-              </button>
-            </div>
-
-            <div className="flex justify-between mb-6">
-              <button
-                onClick={() => handleDateChange(-1)}
-                className="border border-blue-900 px-3 py-2 rounded-full transition duration-200"
-              >
-                &lt;
-              </button>
-              <p className="poppins-semibold text-lg text-gray-800">
-                {format(currentMonth, "MMMM yyyy")}
-              </p>
-              <button
-                onClick={() => handleDateChange(1)}
-                className="border border-blue-900 px-3 py-2 rounded-full transition duration-200"
-              >
-                &gt;
-              </button>
-            </div>
-
-            <div className="flex overflow-x-scroll gap-4 mb-6">
-              {daysInMonth.map((day) => (
-                <button
-                  key={day}
-                  onClick={() => setSelectedDate(day)}
-                  className={`py-2 px-4 rounded-full text-lg poppins-medium ${
-                    selectedDate?.getDate() === day.getDate()
-                      ? "border border-blue-500 text-white bg-blue-500"
-                      : "bg-white text-blue-500 border border-blue-500" 
-                  }`}
-                >
-                  {format(day, "dd")}
-                </button>
-              ))}
-            </div>
-
-            <div className="grid grid-cols-5 gap-4 mb-6">
-              {schedule.map((slot, index) => (
-                <button
-                  key={index}
-                  disabled={!slot.available}
-                  onClick={() => setSelectedHour(slot.time)}
-                  className={`py-2 px-2 rounded-full text-sm poppins-medium
-                    ${
-                      slot.available
-                        ? "border border-blue-400 shadow-md focus-outline-blue-500"
-                        : "bg-gray-300 cursor-not-allowed"
-                    } 
-                    ${selectedHour === slot.time ? "bg-blue-500 text-white" : ""} 
-                    text-blue-500 transition duration-200`}
-                >
-                  {slot.time}
-                </button>
-              ))}
-            </div>
-
-            <div className="flex justify-center">
-              <button
-                onClick={handleReserve}
-                disabled={!selectedDate || !selectedHour}
-                className="border border-blue-500 text-blue-900 px-2 py-1 rounded-xl poppins-regular transition duration-200"
-              >
-                Confirmar
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+      <Modal
+        isModalOpen={isModalOpen}
+        isAnimating={isAnimating}
+        closeModal={closeModal}
+        selectedService={selectedService}
+        selectedDate={selectedDate}
+        schedule={schedule}
+        handleDateChange={handleDateChange}
+        daysInMonth={daysInMonth}
+        setSelectedDate={setSelectedDate}
+        selectedHour={selectedHour}
+        setSelectedHour={setSelectedHour}
+        handleReserve={handleReserve}
+        currentMonth={currentMonth}
+      />
     </div>
   );
 };

@@ -5,20 +5,30 @@ const AuthContext = createContext();
 export const AuthProvider = ({ children }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(!!localStorage.getItem("token"));
   const [user, setUser] = useState(null);
-
   useEffect(() => {
     const storedUser = localStorage.getItem("cliente");
     if (storedUser) {
-      setUser(JSON.parse(storedUser));
+      const cliente = JSON.parse(storedUser);
+      console.log("Datos del cliente desde localStorage:", cliente);
+      setUser(cliente);
     }
   }, []);
-
+  
+  
   const login = (token, cliente) => {
-    localStorage.setItem("token", token);
-    localStorage.setItem("cliente", JSON.stringify(cliente));
-    setUser(cliente);
-    setIsAuthenticated(true);
+    console.log("Cliente en login:", cliente);  // Verifica los valores
+    if (cliente && cliente.name && cliente.phone) {
+      localStorage.setItem("token", token);
+      localStorage.setItem("cliente", JSON.stringify(cliente));  // Guarda los datos del cliente
+      setUser(cliente);
+      setIsAuthenticated(true);
+    } else {
+      console.error("Datos incompletos del cliente.");
+    }
   };
+  
+  
+  
 
   const logout = () => {
     localStorage.removeItem("token");

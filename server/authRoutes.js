@@ -33,7 +33,7 @@ const calendar = google.calendar({ version: "v3", auth });
 
 // Función para agregar un turno a Google Calendar y Google Sheets
 async function addTurno({ nombre, telefono,fecha, hora, servicio }) {
-  const calendarId = "primary"; // Cambiar si se utiliza un calendario específico
+  const calendarId = "64d8a3147dcdf3eefeceac5a4b38a597a6498cad08716ce4ffa0548a885807f7@group.calendar.google.com"; // Cambiar si se utiliza un calendario específico
   const startDateTime = new Date(`${fecha}T${hora}:00-03:00`);
   const endDateTime = new Date(startDateTime.getTime() + 60 * 60 * 1000); // 1 hora
 

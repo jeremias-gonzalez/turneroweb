@@ -16,7 +16,11 @@ const Login = () => {
     try {
       const backendUrl = import.meta.env.VITE_BACKEND_URL;
       const response = await axios.post(`${backendUrl}/api/login`, formData);
+      
+      // Guarda tanto el token como los datos del usuario
       localStorage.setItem("token", response.data.token);
+      localStorage.setItem("user", JSON.stringify(response.data.user));  // Guarda los datos del usuario
+
       alert(response.data.message); // Mensaje de éxito
       window.location.href = "/"; // Redirigir al home
     } catch (err) {

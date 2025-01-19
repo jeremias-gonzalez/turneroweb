@@ -145,7 +145,7 @@
   }
   .modal-enter {
     opacity: 0;
-    transform: translatey(30px);
+    transform: translatey(10px);
   }
   .modal-enter-active {
     opacity: 1;
